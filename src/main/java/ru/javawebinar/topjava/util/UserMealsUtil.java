@@ -40,20 +40,20 @@ public class UserMealsUtil {
         if (endTime == null)
             endTime = LocalTime.MAX;
         //сумма калорий, сгруппированная по дате
-        HashMap<LocalDate, Integer> mapByDays = new HashMap<>();
+        Map<LocalDate, Integer> mapByDays = new HashMap<>();
         for (UserMeal meal : mealList) {
-            if (meal != null && meal.getDateTime() != null) {
+            if (meal.getDateTime() != null) {
                 mapByDays.merge(meal.getDateTime().toLocalDate(),
                         meal.getCalories(), Integer::sum);
             }
         }
         List<UserMealWithExceed> resultList = new ArrayList<>();
         for (UserMeal meal : mealList) {
-            if (meal != null && meal.getDateTime() != null &&
+            if (meal.getDateTime() != null &&
                     TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                 resultList.add(new UserMealWithExceed(meal.getDateTime(), meal.getDescription(),
                         meal.getCalories(),
-                        mapByDays.getOrDefault(meal.getDateTime().toLocalDate(), 0) > caloriesPerDay));
+                        mapByDays.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
             }
         }
         return resultList;
@@ -67,16 +67,15 @@ public class UserMealsUtil {
         LocalTime endTimeChecked = endTime == null ? LocalTime.MAX : endTime;
         //сумма калорий, сгруппированная по дате
         Map<LocalDate, Integer> mapByDays = mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()))
+                .filter(meal -> Objects.nonNull(meal.getDateTime()))
                 .collect(Collectors.groupingBy(p -> p.getDateTime().toLocalDate(),
                         Collectors.summingInt(UserMeal::getCalories)));
         return mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()) &&
+                .filter(meal -> Objects.nonNull(meal.getDateTime()) &&
                         TimeUtil.isBetween(meal.getDateTime().toLocalTime(),
                                 startTimeChecked, endTimeChecked))
                 .map(meal -> new UserMealWithExceed(meal.getDateTime(), meal.getDescription(),
-                        meal.getCalories(), mapByDays.getOrDefault(meal.getDateTime().toLocalDate(),
-                        0) > caloriesPerDay))
+                        meal.getCalories(), mapByDays.get(meal.getDateTime().toLocalDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +91,7 @@ public class UserMealsUtil {
         LocalDate minDate = null, maxDate = null;
         //Поиск минимальной и максимальной даты записей из mealList, для которых надо будет суммировать дневные калории
         for (UserMeal meal : mealList) {
-            if (meal != null && meal.getDateTime() != null
+            if (meal.getDateTime() != null
                     && TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                 minDate = minDate == null || minDate.isAfter(meal.getDateTime().toLocalDate()) ?
                         meal.getDateTime().toLocalDate() : minDate;
@@ -109,7 +108,7 @@ public class UserMealsUtil {
         //сумма калорий, сгруппированная по дате
         int[] caloriesPerDayArray = new int[(int) diffDays];
         for (UserMeal meal : mealList) {
-            if (meal != null && meal.getDateTime() != null &&
+            if (meal.getDateTime() != null &&
                     !meal.getDateTime().toLocalDate().isBefore(minDate) &&
                     !meal.getDateTime().toLocalDate().isAfter(maxDate)) {
                 caloriesPerDayArray[(int) DAYS.between(minDate, meal.getDateTime().toLocalDate())] += meal.getCalories();
@@ -117,7 +116,7 @@ public class UserMealsUtil {
         }
         List<UserMealWithExceed> resultList = new ArrayList<>();
         for (UserMeal meal : mealList) {
-            if (meal != null && meal.getDateTime() != null &&
+            if (meal.getDateTime() != null &&
                     TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                 resultList.add(new UserMealWithExceed(meal.getDateTime(), meal.getDescription(),
                         meal.getCalories(),
@@ -140,12 +139,12 @@ public class UserMealsUtil {
         Comparator<UserMeal> comparator = Comparator.comparing(meal -> meal.getDateTime().toLocalDate());
 
         UserMeal minDateMeal = mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()) &&
+                .filter(meal -> Objects.nonNull(meal.getDateTime()) &&
                         TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTimeChecked, endTimeChecked))
                 .min(comparator)
                 .orElse(null);
         UserMeal maxDateMeal = mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()) &&
+                .filter(meal -> Objects.nonNull(meal.getDateTime()) &&
                         TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTimeChecked, endTimeChecked))
                 .max(comparator)
                 .orElse(null);
@@ -162,13 +161,13 @@ public class UserMealsUtil {
         //сумма калорий, сгруппированная по дате
         int[] caloriesPerDayArray = new int[(int) diffDays];
         mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()) &&
+                .filter(meal -> Objects.nonNull(meal.getDateTime()) &&
                         !meal.getDateTime().toLocalDate().isBefore(minDate) &&
                         !meal.getDateTime().toLocalDate().isAfter(maxDate))
                 .forEach(meal -> caloriesPerDayArray[(int) DAYS.between(minDate, meal.getDateTime().toLocalDate())] += meal.getCalories());
 
         return mealList.stream()
-                .filter(meal -> Objects.nonNull(meal) && Objects.nonNull(meal.getDateTime()) &&
+                .filter(meal -> Objects.nonNull(meal.getDateTime()) &&
                         TimeUtil.isBetween(meal.getDateTime().toLocalTime(),
                                 startTimeChecked, endTimeChecked))
                 .map(meal -> new UserMealWithExceed(meal.getDateTime(), meal.getDescription(),
