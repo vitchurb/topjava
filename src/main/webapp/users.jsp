@@ -1,7 +1,8 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ include file="/include/include.jsp" %>
 <html>
 <head>
     <title>User list</title>
+    <%@ include file="/include/style.jsp" %>
 </head>
 <body>
 <h2><a href="index.html">Home</a></h2>
