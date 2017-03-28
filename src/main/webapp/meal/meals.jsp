@@ -23,14 +23,7 @@
         <tbody>
         <c:forEach items="${mealsWithExceeded}" var="meal">
             <tr class="
-        <c:choose>
-        <c:when test="${meal.exceed}">
-            exceedLimit
-        </c:when>
-        <c:otherwise>
-            notExceedLimit
-        </c:otherwise>
-        </c:choose>
+            <c:out value="${meal.exceed ?  'exceedLimit' : 'notExceedLimit'}" />
         ">
                 <td>${meal.dateTimeStr}</td>
                 <td>${meal.description}</td>
