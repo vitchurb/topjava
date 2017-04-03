@@ -10,6 +10,24 @@
 <ul>
     <li><a href="users">User List</a></li>
     <li><a href="meals">Meal List</a></li>
+
+    <form method="post" action="users?action=changeUser">
+        <table border="1" cellpadding="8" cellspacing="0">
+            <tr>
+                <td>Пользователи:</td>
+                <td><select name="userSelectId">
+                    <option value="1">Пользователь 1</option>
+                    <option value="2">Пользователь 2</option>
+                </select>
+            </tr>
+            <tr>
+                <td>
+                    <button type="submit">Сменить пользователя</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
 </ul>
 </body>
 </html>

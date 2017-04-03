@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
@@ -44,11 +43,7 @@ public class MealServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
         String action = request.getParameter("action");
-        if ("changeUser".equals(action)) {
-            AuthorizedUser.setId(Integer.valueOf(request.getParameter("userSelectId")));
-            request.getSession().setAttribute("userSelectId", request.getParameter("userSelectId"));
-            response.sendRedirect("meals");
-        } else if ("search".equals(action)) {
+        if ("search".equals(action)) {
             request.getSession().setAttribute("filterDateFrom", parse(() -> DateTimeUtil.parseDate(request.getParameter("filterDateFrom"))));
             request.getSession().setAttribute("filterDateTo", parse(() -> DateTimeUtil.parseDate(request.getParameter("filterDateTo"))));
             request.getSession().setAttribute("filterTimeFrom", parse(() -> DateTimeUtil.parseTime(request.getParameter("filterTimeFrom"))));

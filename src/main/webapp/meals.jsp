@@ -18,24 +18,6 @@
 <body>
 <section>
     <h2><a href="index.html">Home</a></h2>
-    <form method="post" action="meals?action=changeUser">
-        <table border="1" cellpadding="8" cellspacing="0">
-            <tr>
-                <td>Пользователи:</td>
-                <td><select name="userSelectId">
-                    <option value="1" <c:if test="${sessionScope.userSelectId == '1' }">selected</c:if>
-                        >Пользователь 1</option>
-                    <option value="2" <c:if test="${sessionScope.userSelectId == '2' }">selected</c:if>
-                        >Пользователь 2</option>
-                </select>
-            </tr>
-            <tr>
-                <td>
-                    <button type="submit">Сменить пользователя</button>
-                </td>
-            </tr>
-        </table>
-    </form>
     <form method="post" action="meals?action=search">
         <table border="1" cellpadding="8" cellspacing="0">
             <tr>
