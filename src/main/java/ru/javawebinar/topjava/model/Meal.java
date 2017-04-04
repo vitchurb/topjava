@@ -46,10 +46,6 @@ public class Meal extends BaseEntity {
         return dateTime.toLocalTime();
     }
 
-    public boolean isNew() {
-        return id == null;
-    }
-
     public Integer getUserId() {
         return userId;
     }

@@ -14,7 +14,7 @@ public class DateTimeUtil {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static <T extends Comparable> boolean isBetween(T lt, T startValue, T endValue) {
+    public static <T extends Comparable<? super T>> boolean isBetween(T lt, T startValue, T endValue) {
         return (startValue == null || lt.compareTo(startValue) >= 0) &&
                 (endValue == null || lt.compareTo(endValue) <= 0);
     }

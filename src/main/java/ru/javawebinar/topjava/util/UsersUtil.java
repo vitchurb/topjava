@@ -16,6 +16,14 @@ public class UsersUtil {
                     1700, true, EnumSet.of(Role.ROLE_ADMIN)),
             new User(null, "User1", "user1@company.com", "12345",
                     2700, true, EnumSet.of(Role.ROLE_USER)),
-            new User(null, "User2", "user2@company.com", "12345",
+            new User(null, "User1", "user2@company.com", "12345",
+                    2700, true, EnumSet.of(Role.ROLE_USER)),
+            new User(null, "User1", "user3@company.com", "12345",
+                    2700, true, EnumSet.of(Role.ROLE_USER)),
+            new User(null, "User1", "user4@company.com", "12345",
+                    2700, true, EnumSet.of(Role.ROLE_USER)),
+            new User(null, "User1", "user5@company.com", "12345",
+                    2700, true, EnumSet.of(Role.ROLE_USER)),
+            new User(null, "User1", "user6@company.com", "12345",
                     100, true, EnumSet.of(Role.ROLE_USER)));
 }
