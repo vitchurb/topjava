@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -58,18 +59,20 @@ public class MealServiceTest {
         measures.add(text);
     }
 
-    @AfterClass
-    public static void tearDown() throws Exception {
-        measures.forEach(logger::info);
-    }
-
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
             logInfo(description, nanos);
         }
+    };
 
+    @ClassRule
+    public static final ExternalResource resource = new ExternalResource() {
+        @Override
+        protected void after() {
+            measures.forEach(logger::info);
+        }
     };
 
     @Test
