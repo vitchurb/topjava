@@ -1,14 +1,15 @@
 package ru.javawebinar.topjava.service;
 
-import org.apache.commons.logging.Log;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.junit.*;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -16,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.repository.mock.InMemoryUserRepositoryImpl;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -24,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -37,7 +38,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    private static final Logger logger = Logger.getLogger(MealServiceTest.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryUserRepositoryImpl.class);
 
     static {
         SLF4JBridgeHandler.install();
@@ -51,19 +52,15 @@ public class MealServiceTest {
 
     private static List<String> measures = new ArrayList<>();
 
-    private void logInfo(Description description, long nanos) {
-        String testName = description.getMethodName();
-        String text = String.format("Test %s. Time: %d milliseconds",
-                testName, TimeUnit.NANOSECONDS.toMillis(nanos));
-        logger.info(text);
-        measures.add(text);
-    }
-
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            logInfo(description, nanos);
+            String testName = description.getMethodName();
+            String text = String.format("Test %s. Time: %d milliseconds",
+                    testName, TimeUnit.NANOSECONDS.toMillis(nanos));
+            LOG.info(text);
+            measures.add(text);
         }
     };
 
@@ -71,7 +68,7 @@ public class MealServiceTest {
     public static final ExternalResource resource = new ExternalResource() {
         @Override
         protected void after() {
-            measures.forEach(logger::info);
+            measures.forEach(LOG::info);
         }
     };
 
