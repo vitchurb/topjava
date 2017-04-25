@@ -11,7 +11,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 /**
  * Created by vit on 24.04.2017.
  */
-@ActiveProfiles({Profiles.ACTIVE_DB, Profiles.DATAJPA})
+@ActiveProfiles(Profiles.DATAJPA)
 public class UserServiceDataJpaTest extends UserServiceTest {
 
     @Test

@@ -7,6 +7,6 @@ import ru.javawebinar.topjava.service.UserServiceTest;
 /**
  * Created by vit on 24.04.2017.
  */
-@ActiveProfiles({Profiles.ACTIVE_DB, Profiles.JPA})
+@ActiveProfiles(Profiles.JPA)
 public class UserServiceJpaTest extends UserServiceTest {
 }
