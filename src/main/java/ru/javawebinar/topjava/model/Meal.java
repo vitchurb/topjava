@@ -18,6 +18,8 @@ import java.time.LocalTime;
 //        @NamedQuery(name = Meal.UPDATE, query = "UPDATE Meal m SET m.dateTime = :datetime, m.calories= :calories," +
 //                "m.description=:desc where m.id=:id and m.user.id=:userId")
 })
+@NamedEntityGraph(name = "mealWithUser", attributeNodes = {
+        @NamedAttributeNode(value = "user")})
 @Entity
 @Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meals_unique_user_datetime_idx")})
 public class Meal extends BaseEntity {
