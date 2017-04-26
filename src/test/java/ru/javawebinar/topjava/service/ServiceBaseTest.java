@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @ActiveProfiles(Profiles.ACTIVE_DB)
 public abstract class ServiceBaseTest {
-    private static final Logger LOG = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceBaseTest.class);
     private static StringBuilder results = new StringBuilder();
 
     static {
@@ -42,7 +42,7 @@ public abstract class ServiceBaseTest {
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            String result = String.format("%-25s %7d", description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+            String result = String.format("%s.%-25s %7d", description.getClass(), description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
             results.append(result).append('\n');
             LOG.info(result + " ms\n");
         }

@@ -19,12 +19,12 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     @Query("DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
     int delete(@Param("id") int id, @Param("userId") int userId);
 
-    Meal findByUserIdAndId(int userId, int id);
+    Meal findByByIdAndUserId(int id,int userId);
 
     List<Meal> findByUserIdOrderByDateTimeDesc(int userId);
 
     List<Meal> findByUserIdAndDateTimeBetweenOrderByDateTimeDesc(int userId, LocalDateTime from, LocalDateTime to);
 
-    @EntityGraph(value = "mealWithUser")
-    Meal findByIdAndUserId(int id, int userId);
+    @EntityGraph(attributePaths = "user")
+    Meal findWithUserByIdAndUserId(int id, int userId);
 }

@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.service.datajpa;
 
+import org.hibernate.Hibernate;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
@@ -18,7 +20,7 @@ public class MealServiceDataJpaTest extends MealServiceTest {
     @Test
     public void testGetWithUser() throws Exception {
         Meal meal = service.getWithUser(MEAL1_ID, USER_ID);
-        meal.getUser().getCaloriesPerDay();
+        Assert.assertTrue(Hibernate.isInitialized(meal.getUser()));
     }
 
 }

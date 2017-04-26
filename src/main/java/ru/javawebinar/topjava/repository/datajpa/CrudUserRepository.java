@@ -31,8 +31,8 @@ public interface CrudUserRepository extends JpaRepository<User, Integer> {
 
     User getByEmail(String email);
 
-    @EntityGraph(value = "userWithMeals")
-    User findById(int id);
+    @EntityGraph(attributePaths = "meals")
+    User findWithMealsById(int id);
 
 
 }
