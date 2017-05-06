@@ -21,13 +21,15 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     protected UserService service;
 
-    @Autowired
+    @Autowired(required = false)
     protected JpaUtil jpaUtil;
+
 
     @Before
     public void setUp() throws Exception {
         service.evictCache();
-        jpaUtil.clear2ndLevelHibernateCache();
+        if (jpaUtil != null)
+            jpaUtil.clear2ndLevelHibernateCache();
     }
 
     @Test
@@ -60,6 +62,12 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         MATCHER.assertEquals(USER, user);
     }
 
+    @Test
+    public void testGetAdmin() throws Exception {
+        User user = service.get(ADMIN_ID);
+        MATCHER.assertEquals(ADMIN, user);
+    }
+
     @Test(expected = NotFoundException.class)
     public void testGetNotFound() throws Exception {
         service.get(1);
@@ -82,12 +90,16 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         User updated = new User(USER);
         updated.setName("UpdatedName");
         updated.setCaloriesPerDay(330);
+        updated.getRoles().add(Role.ROLE_ADMIN);
+        updated.getRoles().remove(Role.ROLE_USER);
         service.update(updated);
         MATCHER.assertEquals(updated, service.get(USER_ID));
     }
 
     @Test
     public void testValidation() throws Exception {
+        disableForJDBC();
+
         validateRootCause(() -> service.save(new User(null, "  ", "mail@yandex.ru", "password", Role.ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.save(new User(null, "User", "  ", "password", Role.ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.save(new User(null, "User", "mail@yandex.ru", "  ", Role.ROLE_USER)), ConstraintViolationException.class);
