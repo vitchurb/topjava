@@ -45,7 +45,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
-        Set<Role> rolesInUser = user.getRoles() == null ? new HashSet<>() : user.getRoles();
+        Set<Role> rolesInUser = user.getRoles() == null ? Collections.EMPTY_SET : user.getRoles();
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
