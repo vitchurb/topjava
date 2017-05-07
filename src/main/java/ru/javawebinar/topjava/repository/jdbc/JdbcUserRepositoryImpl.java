@@ -45,24 +45,23 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        Set<Role> rolesInUser = user.getRoles() == null ? new HashSet<>() : user.getRoles();
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-            if (user.getRoles() != null) {
-                List<Object[]> lst = new ArrayList<>(user.getRoles().size());
-                user.getRoles().stream()
-                        .map(Enum::toString)
-                        .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
-                jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
-            }
+            List<Object[]> lst = new ArrayList<>(rolesInUser.size());
+            rolesInUser.stream()
+                    .map(Enum::toString)
+                    .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
+            jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
         } else {
             namedParameterJdbcTemplate.update(
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
                             " registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id",
                     parameterSource);
             Map<String, Object> paramsMap = new HashMap<>();
-            paramsMap.put("roles", user.getRoles().stream().map(Enum::toString).collect(Collectors.toList()));
+            paramsMap.put("roles", rolesInUser.stream().map(Enum::toString).collect(Collectors.toList()));
             paramsMap.put("userId", user.getId());
             //удаление лишних
             namedParameterJdbcTemplate.update("DELETE FROM user_roles " +
@@ -71,7 +70,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     " WHERE user_id=? ", String.class, user.getId());
             //вставка недостающих
             List<Object[]> lst = new ArrayList<>();
-            user.getRoles().stream()
+            rolesInUser.stream()
                     .map(Enum::toString)
                     .filter(roleName -> !rolesFromDb.contains(roleName))
                     .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
