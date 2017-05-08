@@ -68,11 +68,12 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     " WHERE user_id = (:userId) AND role NOT IN (:roles)", paramsMap);
             List<String> rolesFromDb = jdbcTemplate.queryForList("SELECT role FROM user_roles " +
                     " WHERE user_id=? ", String.class, user.getId());
+            Set<String> rolesFromDbSet = new HashSet<>(rolesFromDb);
             //вставка недостающих
             List<Object[]> lst = new ArrayList<>();
             rolesInUser.stream()
                     .map(Enum::toString)
-                    .filter(roleName -> !rolesFromDb.contains(roleName))
+                    .filter(roleName -> !rolesFromDbSet.contains(roleName))
                     .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
             jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
         }
