@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         service.evictCache();
         if (jpaUtil != null)
             jpaUtil.clear2ndLevelHibernateCache();
+    }
+
+    @Test
+    public void testJpaUtil() throws Exception {
+        disableForJDBC();
+        Assert.assertNotNull(jpaUtil);
     }
 
     @Test

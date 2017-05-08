@@ -75,7 +75,8 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     .map(Enum::toString)
                     .filter(roleName -> !rolesFromDbSet.contains(roleName))
                     .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
-            jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
+            if (!lst.isEmpty())
+                jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
         }
         return user;
     }
