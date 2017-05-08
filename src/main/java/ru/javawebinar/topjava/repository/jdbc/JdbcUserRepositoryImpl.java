@@ -47,14 +47,13 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     public User save(User user) {
         Set<Role> rolesInUser = user.getRoles() == null ? Collections.EMPTY_SET : user.getRoles();
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
+        List<Object[]> lstInsertRoles = new ArrayList<>();
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-            List<Object[]> lst = new ArrayList<>(rolesInUser.size());
             rolesInUser.stream()
                     .map(Enum::toString)
-                    .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
-            jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
+                    .forEach(roleName -> lstInsertRoles.add(new Object[]{user.getId(), roleName}));
         } else {
             namedParameterJdbcTemplate.update(
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
@@ -70,14 +69,13 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     " WHERE user_id=? ", String.class, user.getId());
             Set<String> rolesFromDbSet = new HashSet<>(rolesFromDb);
             //вставка недостающих
-            List<Object[]> lst = new ArrayList<>();
             rolesInUser.stream()
                     .map(Enum::toString)
                     .filter(roleName -> !rolesFromDbSet.contains(roleName))
-                    .forEach(roleName -> lst.add(new Object[]{user.getId(), roleName}));
-            if (!lst.isEmpty())
-                jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lst);
+                    .forEach(roleName -> lstInsertRoles.add(new Object[]{user.getId(), roleName}));
         }
+        if (!lstInsertRoles.isEmpty())
+            jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lstInsertRoles);
         return user;
     }
 
