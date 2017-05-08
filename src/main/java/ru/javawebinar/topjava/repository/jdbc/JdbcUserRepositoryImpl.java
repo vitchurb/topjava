@@ -64,7 +64,8 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             paramsMap.put("userId", user.getId());
             //удаление лишних
             namedParameterJdbcTemplate.update("DELETE FROM user_roles " +
-                    " WHERE user_id = (:userId) AND role NOT IN (:roles)", paramsMap);
+                    " WHERE user_id = (:userId) " +
+                    (rolesInUser.isEmpty() ? "" : " AND role NOT IN (:roles)"), paramsMap);
             List<String> rolesFromDb = jdbcTemplate.queryForList("SELECT role FROM user_roles " +
                     " WHERE user_id=? ", String.class, user.getId());
             Set<String> rolesFromDbSet = new HashSet<>(rolesFromDb);
