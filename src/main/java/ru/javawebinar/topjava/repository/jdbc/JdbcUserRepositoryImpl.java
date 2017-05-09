@@ -51,9 +51,10 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-            rolesInUser.stream()
-                    .map(Enum::toString)
-                    .forEach(roleName -> lstInsertRoles.add(new Object[]{user.getId(), roleName}));
+            if (!rolesInUser.isEmpty()) {
+                rolesInUser.forEach(role -> lstInsertRoles.add(new Object[]{user.getId(), role.toString()}));
+                jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lstInsertRoles);
+            }
         } else {
             namedParameterJdbcTemplate.update(
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
@@ -66,17 +67,17 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             namedParameterJdbcTemplate.update("DELETE FROM user_roles " +
                     " WHERE user_id = (:userId) " +
                     (rolesInUser.isEmpty() ? "" : " AND role NOT IN (:roles)"), paramsMap);
-            List<String> rolesFromDb = jdbcTemplate.queryForList("SELECT role FROM user_roles " +
-                    " WHERE user_id=? ", String.class, user.getId());
-            Set<String> rolesFromDbSet = new HashSet<>(rolesFromDb);
             //вставка недостающих
-            rolesInUser.stream()
-                    .map(Enum::toString)
-                    .filter(roleName -> !rolesFromDbSet.contains(roleName))
-                    .forEach(roleName -> lstInsertRoles.add(new Object[]{user.getId(), roleName}));
+            if (!rolesInUser.isEmpty()) {
+                rolesInUser.forEach(role -> lstInsertRoles.add(
+                        new Object[]{user.getId(), role.toString(), user.getId(), role.toString()}));
+                jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) " +
+                        " SELECT  ?, ? " +
+                        " WHERE NOT EXISTS (SELECT user_id, role " +
+                        " FROM user_roles " +
+                        " WHERE user_id=? and role=?)", lstInsertRoles);
+            }
         }
-        if (!lstInsertRoles.isEmpty())
-            jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lstInsertRoles);
         return user;
     }
 
