@@ -92,6 +92,6 @@ abstract public class AbstractServiceTest {
 
     protected void disableForJDBC() {
         Assume.assumeFalse(Arrays.stream(environment.getActiveProfiles())
-                .anyMatch(p -> "jdbc".equals(p)));
+                .anyMatch("jdbc"::equals));
     }
 }
