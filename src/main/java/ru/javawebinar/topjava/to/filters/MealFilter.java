@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.web.meal;
+package ru.javawebinar.topjava.to.filters;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

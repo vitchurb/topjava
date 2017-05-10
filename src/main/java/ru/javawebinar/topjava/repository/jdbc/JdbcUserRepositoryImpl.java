@@ -47,12 +47,13 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     public User save(User user) {
         Set<Role> rolesInUser = user.getRoles() == null ? Collections.EMPTY_SET : user.getRoles();
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
-        List<Object[]> lstInsertRoles = new ArrayList<>();
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
             if (!rolesInUser.isEmpty()) {
-                rolesInUser.forEach(role -> lstInsertRoles.add(new Object[]{user.getId(), role.toString()}));
+                List<Object[]> lstInsertRoles = rolesInUser.stream()
+                        .map(role -> new Object[]{user.getId(), role.toString()})
+                        .collect(Collectors.toList());
                 jdbcTemplate.batchUpdate("insert into user_roles (user_id, role) values (?, ?)", lstInsertRoles);
             }
         } else {
@@ -60,22 +61,32 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
                             " registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id",
                     parameterSource);
-            Map<String, Object> paramsMap = new HashMap<>();
-            paramsMap.put("roles", rolesInUser.stream().map(Enum::toString).collect(Collectors.toList()));
-            paramsMap.put("userId", user.getId());
-            //удаление лишних
-            namedParameterJdbcTemplate.update("DELETE FROM user_roles " +
-                    " WHERE user_id = (:userId) " +
-                    (rolesInUser.isEmpty() ? "" : " AND role NOT IN (:roles)"), paramsMap);
+            List<String> rolesFromDb = jdbcTemplate.queryForList("SELECT role FROM user_roles " +
+                    " WHERE user_id=? ", String.class, user.getId());
+            Set<String> rolesFromDbSet = new HashSet<>(rolesFromDb);
+            List<Object[]> lstInsertRoles = rolesInUser.stream()
+                    .map(Enum::toString)
+                    .filter(roleName -> !rolesFromDbSet.contains(roleName))
+                    .map(roleName -> new Object[]{user.getId(), roleName})
+                    .collect(Collectors.toList());
+
+            List<String> lstDeleteRoles = rolesFromDbSet.stream()
+                    .map(Role::valueOf)
+                    .filter(role -> !rolesInUser.contains(role))
+                    .map(Enum::toString)
+                    .collect(Collectors.toList());
+
+            if (!lstDeleteRoles.isEmpty()) {
+                Map<String, Object> paramsMap = new HashMap<>();
+                paramsMap.put("roles", lstDeleteRoles);
+                paramsMap.put("userId", user.getId());
+                //удаление лишних
+                namedParameterJdbcTemplate.update("DELETE FROM user_roles " +
+                        " WHERE user_id = (:userId) AND role IN (:roles)", paramsMap);
+            }
             //вставка недостающих
-            if (!rolesInUser.isEmpty()) {
-                rolesInUser.forEach(role -> lstInsertRoles.add(
-                        new Object[]{user.getId(), role.toString(), user.getId(), role.toString()}));
-                jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) " +
-                        " SELECT  ?, ? " +
-                        " WHERE NOT EXISTS (SELECT user_id, role " +
-                        " FROM user_roles " +
-                        " WHERE user_id=? and role=?)", lstInsertRoles);
+            if (!lstInsertRoles.isEmpty()) {
+                jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?, ?)", lstInsertRoles);
             }
         }
         return user;
@@ -114,28 +125,25 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     private static class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
         public List<User> extractData(ResultSet rs) throws SQLException,
                 DataAccessException {
-            Map<Integer, User> usersMap = new HashMap<>();
-            List<User> usersList = new ArrayList<>();
+            Map<Integer, User> usersMap = new LinkedHashMap<>();
             while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getInt("id"));
-                User oldUser = usersMap.get(user.getId());
-                if (oldUser != null) {
-                    user = oldUser;
-                } else {
-                    usersMap.put(user.getId(), user);
-                    usersList.add(user);
+                Integer id = rs.getInt("id");
+                User user = usersMap.get(id);
+                if (user == null) {
+                    user = new User();
+                    user.setId(id);
                     user.setName(rs.getString("name"));
                     user.setCaloriesPerDay(rs.getInt("calories_per_day"));
                     user.setEmail(rs.getString("email"));
                     user.setEnabled(rs.getBoolean("enabled"));
                     user.setRegistered(rs.getTimestamp("registered"));
                     user.setPassword(rs.getString("password"));
+                    usersMap.put(user.getId(), user);
                 }
 
                 Set<Role> rolesSet = user.getRoles();
                 if (rolesSet == null) {
-                    rolesSet = new HashSet<>();
+                    rolesSet = EnumSet.noneOf(Role.class);
                     user.setRoles(rolesSet);
                 }
                 String roleString = rs.getString("role");
@@ -143,7 +151,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                     rolesSet.add(Role.valueOf(roleString));
                 }
             }
-            return usersList;
+            return new ArrayList<>(usersMap.values());
         }
     }
 
