@@ -21,7 +21,7 @@ public abstract class AbstractMealController {
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private MealService service;
+    protected MealService service;
 
     public Meal get(int id) {
         int userId = AuthorizedUser.id();
