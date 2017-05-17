@@ -26,6 +26,10 @@ public class CustomDateTimeAnnotationFormatterFactory
         return fieldTypes;
     }
 
+    public DateTimeFormatter getDateTimeFormatter(String mask) {
+        return new CustomDateTimeFormatter(mask).getFormatter();
+    }
+
     @Override
     public Printer<?> getPrinter(CustomDateTime customDateTime, Class<?> aClass) {
         return new CustomDateTimeFormatter(customDateTime.value());
@@ -56,6 +60,10 @@ public class CustomDateTimeAnnotationFormatterFactory
         @Override
         public LocalDateTime parse(String text, Locale locale) throws DateTimeException {
             return LocalDateTime.parse(text, formatter);
+        }
+
+        DateTimeFormatter getFormatter() {
+            return formatter;
         }
     }
 

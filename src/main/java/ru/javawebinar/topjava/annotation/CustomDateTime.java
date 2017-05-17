@@ -9,5 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CustomDateTime {
-    String value() default "yyyy-MM-dd HH:mm";
+    String formatMask = "yyyy-MM-dd HH:mm";
+
+    String value() default formatMask;
 }
