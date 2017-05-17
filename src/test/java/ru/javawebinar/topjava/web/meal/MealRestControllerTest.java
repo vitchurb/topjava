@@ -39,16 +39,6 @@ public class MealRestControllerTest extends AbstractControllerTest {
     @Autowired
     protected MealService mealService;
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Resource
-    private FormatterRegistry formatterRegistry;
-
-    @PostConstruct
-    void init() {
-        formatterRegistry.removeConvertible(String.class, LocalDateTime.class);
-        formatterRegistry.addFormatterForFieldAnnotation(new CustomDateTimeAnnotationFormatterFactory());
-    }
-
     @Test
     public void testGet() throws Exception {
         mockMvc.perform(get(REST_URL + MEAL1.getId()))
@@ -60,13 +50,25 @@ public class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void testDelete() throws Exception {
+    public void testDeleteNotFound() throws Exception {
         mockMvc.perform(delete(REST_URL + MEAL1.getId()))
                 .andDo(print())
                 .andExpect(status().isOk());
         mealService.get(MEAL1.getId(), USER_ID);
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        List<MealWithExceed> testList = MealsUtil.getWithExceeded(Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2),
+                USER.getCaloriesPerDay());
+        mockMvc.perform(delete(REST_URL + MEAL1.getId()))
+                .andDo(print())
+                .andExpect(status().isOk());
+        TestUtil.print(mockMvc.perform(get(REST_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MealTestData.MATCHER_EXCEED.contentListMatcher(testList)));
+    }
 
     @Test
     public void testGetAll() throws Exception {
@@ -83,22 +85,26 @@ public class MealRestControllerTest extends AbstractControllerTest {
         List<MealWithExceed> testList = MealsUtil.getWithExceeded(Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1),
                 USER.getCaloriesPerDay());
         List<MealWithExceed> testList1 = testList.subList(1, 5);
-        TestUtil.print(mockMvc.perform(get(REST_URL + "by?startDateTime=2015-05-30 12:41&endDateTime=2015-05-31 14:00"))
+        TestUtil.print(mockMvc.perform(get(REST_URL + "by")
+                .param("startDateTime", "2015-05-30 12:41")
+                .param("endDateTime", "2015-05-31 14:00"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MealTestData.MATCHER_EXCEED.contentListMatcher(testList1)));
 
         List<MealWithExceed> testList2 = testList.subList(0, 5);
-        TestUtil.print(mockMvc.perform(get(REST_URL + "by?startDateTime=2015-05-30 12:41"))
+        TestUtil.print(mockMvc.perform(get(REST_URL + "by")
+                .param("startDateTime", "2015-05-30 12:41"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MealTestData.MATCHER_EXCEED.contentListMatcher(testList2)));
 
         List<MealWithExceed> testList3 = testList.subList(1, 6);
-        TestUtil.print(mockMvc.perform(get(REST_URL + "by?endDateTime=2015-05-31 14:00"))
+        TestUtil.print(mockMvc.perform(get(REST_URL + "by")
+                .param("endDateTime", "2015-05-31 14:00")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MealTestData.MATCHER_EXCEED.contentListMatcher(testList3)));
+                .andExpect(MealTestData.MATCHER_EXCEED.contentListMatcher(testList3));
     }
 
     @Test
