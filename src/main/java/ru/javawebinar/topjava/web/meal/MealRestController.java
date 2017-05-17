@@ -11,12 +11,11 @@ import ru.javawebinar.topjava.annotation.CustomDateTime;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealWithExceed;
 import ru.javawebinar.topjava.util.DateTimeUtil;
-import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(MealRestController.REST_URL)
@@ -63,15 +62,13 @@ public class MealRestController extends AbstractMealController {
     ) {
         int userId = AuthorizedUser.id();
         LOG.info("getBetween dates({} - {}) for User {}", startDateTime, endDateTime, userId);
-        startDateTime = startDateTime == null ? DateTimeUtil.MIN_DATETIME : startDateTime;
-        endDateTime = endDateTime == null ? DateTimeUtil.MAX_DATETIME : endDateTime;
-        LocalDateTime startDateTimeStartDay = startDateTime.truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endDateTimeEndDay = endDateTime.truncatedTo(ChronoUnit.DAYS).plusDays(1).minusNanos(1);
-        return MealsUtil.getFilteredWithExceeded(
-                service.getBetweenDateTimes(startDateTimeStartDay, endDateTimeEndDay, userId),
-                startDateTime, endDateTime,
-                AuthorizedUser.getCaloriesPerDay()
-        );
+        LocalDateTime startDateTime1 = startDateTime == null ? DateTimeUtil.MIN_DATETIME : startDateTime;
+        LocalDateTime endDateTime1 = endDateTime == null ? DateTimeUtil.MAX_DATETIME : endDateTime;
+        LocalDateTime endDateTimeEndDay = endDateTime1.plusDays(1);
+        return super.getBetween(startDateTime1.toLocalDate(), null, endDateTimeEndDay.toLocalDate(), null)
+                .stream()
+                .filter(meal -> DateTimeUtil.isBetween(meal.getDateTime(), startDateTime1, endDateTime1))
+                .collect(Collectors.toList());
     }
 
 }
