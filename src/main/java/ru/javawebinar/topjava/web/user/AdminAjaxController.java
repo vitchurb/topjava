@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -43,4 +44,12 @@ public class AdminAjaxController extends AbstractUserController {
             super.update(user, id);
         }
     }
+
+    @PostMapping(value = "/{id}/toggleEnabled", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Boolean toggleEnabled(@PathVariable("id") int id, @RequestParam("enabled") boolean enabled,
+                                HttpServletRequest request) {
+        User newUser = super.toggleEnabled(id, enabled);
+        return newUser.isEnabled();
+    }
+
 }

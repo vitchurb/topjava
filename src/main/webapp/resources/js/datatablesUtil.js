@@ -1,6 +1,6 @@
 function makeEditable() {
     $('.delete').click(function () {
-        deleteRow($(this).attr("id"));
+        deleteRow($(this).closest("tr").attr("itemId"));
     });
 
     $('#detailsForm').submit(function () {
@@ -8,8 +8,8 @@ function makeEditable() {
         return false;
     });
 
-    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
-        failNoty(event, jqXHR, options, jsExc);
+    $(document).ajaxError(function (event, jqXHR) {
+        failNoty(jqXHR);
     });
 }
 
@@ -26,16 +26,6 @@ function deleteRow(id) {
             updateTable();
             successNoty('Deleted');
         }
-    });
-}
-
-function updateTable() {
-    $.get(ajaxUrl, function (data) {
-        datatableApi.clear();
-        $.each(data, function (key, item) {
-            datatableApi.row.add(item);
-        });
-        datatableApi.draw();
     });
 }
 
@@ -72,7 +62,7 @@ function successNoty(text) {
     });
 }
 
-function failNoty(event, jqXHR, options, jsExc) {
+function failNoty(jqXHR) {
     closeNoty();
     failedNote = noty({
         text: 'Failed: ' + jqXHR.statusText + "<br>",
