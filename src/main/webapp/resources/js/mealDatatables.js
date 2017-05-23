@@ -49,8 +49,7 @@ function resetForm(formElement) {
 
 function updateTable() {
     var form = $('#filterForm');
-    $.ajax({
-        type: "GET",
+    $.get({
         url: ajaxUrl + 'filter',
         cache: false,
         data: form.serialize(),
