@@ -43,10 +43,11 @@ $(function () {
 
 function toggleUserEnabled(checkboxItem) {
     var tr = $(checkboxItem).closest("tr");
+    var newEnabled = $(checkboxItem).prop('checked');
     $.ajax({
         url: ajaxUrl + tr.attr("itemId") + '/toggleEnabled',
         type: 'POST',
-        data: {enabled : $(checkboxItem).prop('checked')},
+        data: {enabled : newEnabled},
         success: function (data) {
             $(checkboxItem).prop( "checked", data);
             if (data) {
@@ -56,6 +57,9 @@ function toggleUserEnabled(checkboxItem) {
                 successNoty('User disabled');
                 tr.addClass("disabledUser");
             }
+        },
+        error: function () {
+            $(checkboxItem).prop("checked", !newEnabled);
         }
     });
 }

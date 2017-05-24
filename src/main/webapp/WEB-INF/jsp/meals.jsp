@@ -32,8 +32,9 @@
                     <dt><spring:message code="meals.endTime"/>:</dt>
                     <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
                 </dl>
-                <button type="submit"><spring:message code="meals.filter"/></button>
-                <button onclick="resetForm(this);"><spring:message code="meals.filter.reset"/></button>
+                <button class="btn btn-xs btn-primary glyphicon glyphicon-filter" aria-hidden="true" type="submit"><spring:message code="meals.filter"/></button>
+                <button class="btn btn-xs btn-primary glyphicon glyphicon-remove" onclick="resetForm(this);"><spring:message code="meals.filter.reset"/></button>
+
             </form>
             <hr>
 
@@ -45,9 +46,9 @@
                 <table class="table table-striped display" id="datatable">
                     <thead>
                     <tr>
-                        <th><spring:message code="meals.dateTime"/></th>
-                        <th><spring:message code="meals.description"/></th>
-                        <th><spring:message code="meals.calories"/></th>
+                        <th align="center"><spring:message code="meals.dateTime"/></th>
+                        <th align="center"><spring:message code="meals.description"/></th>
+                        <th align="center"><spring:message code="meals.calories"/></th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -59,7 +60,7 @@
                                     ${fn:formatDateTime(meal.dateTime)}
                             </td>
                             <td>${meal.description}</td>
-                            <td>${meal.calories}</td>
+                            <td align="right">${meal.calories}</td>
                             <td><a class="btn btn-xs btn-primary">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a></td>
