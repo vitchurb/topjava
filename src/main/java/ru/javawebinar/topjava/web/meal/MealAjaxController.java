@@ -46,7 +46,7 @@ public class MealAjaxController extends AbstractMealController {
     public ResponseEntity<String> createOrUpdate(@Validated(ValidationAjaxSave.class) Meal meal, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder sb = new StringBuilder();
-            result.getGlobalErrors().forEach(fe -> sb.append(messageSource.getMessage(fe, LocaleContextHolder.getLocale()))
+            result.getGlobalErrors().forEach(ge -> sb.append(messageSource.getMessage(ge, LocaleContextHolder.getLocale()))
                     .append("<br>"));
             result.getFieldErrors().forEach(fe -> sb.append(messageSource.getMessage(fe, LocaleContextHolder.getLocale()))
                     .append("<br>"));
