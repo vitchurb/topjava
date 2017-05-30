@@ -19,7 +19,11 @@ function updateRow(id) {
     $('#modalTitle').html(i18n["editTitle"]);
     $.get(ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
-            form.find("input[name='" + key + "']").val(value);
+            var row = form.find("input[name='" + key + "']");
+            if (value && row.hasClass("datetimepicker")) {
+                value = value.replace('T', ' ').slice(0, -3);
+            }
+            row.val(value);
         });
         $('#editRow').modal();
     });

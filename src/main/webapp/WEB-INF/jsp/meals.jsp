@@ -25,14 +25,14 @@
                                         code="meals.startDate"/>:</label>
 
                                 <div class="col-sm-4">
-                                    <input class="form-control" type="date" name="startDate" id="startDate">
+                                    <input class="form-control datepicker" name="startDate" id="startDate">
                                 </div>
 
                                 <label class="control-label col-sm-3" for="startTime"><spring:message
                                         code="meals.startTime"/>:</label>
 
                                 <div class="col-sm-3">
-                                    <input class="form-control" type="time" name="startTime" id="startTime">
+                                    <input class="form-control timepicker" name="startTime" id="startTime">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -40,14 +40,14 @@
                                         code="meals.endDate"/>:</label>
 
                                 <div class="col-sm-4">
-                                    <input class="form-control" type="date" name="endDate" id="endDate">
+                                    <input class="form-control datepicker" name="endDate" id="endDate">
                                 </div>
 
                                 <label class="control-label col-sm-3" for="endTime"><spring:message
                                         code="meals.endTime"/>:</label>
 
                                 <div class="col-sm-3">
-                                    <input class="form-control" type="time" name="endTime" id="endTime">
+                                    <input class="form-control timepicker" name="endTime" id="endTime">
                                 </div>
                             </div>
                         </form>
@@ -77,24 +77,6 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <c:forEach items="${meals}" var="meal">
-                        <jsp:useBean id="meal" scope="page" type="ru.javawebinar.topjava.to.MealWithExceed"/>
-                        <tr class="${meal.exceed ? 'exceeded' : 'normal'}">
-                            <td>
-                                    <%--<fmt:parseDate value="${meal.dateTime}" pattern="y-M-dd'T'H:m" var="parsedDate"/>--%>
-                                    <%--<fmt:formatDate value="${parsedDate}" pattern="yyyy.MM.dd HH:mm" />--%>
-                                    ${fn:formatDateTime(meal.dateTime)}
-                            </td>
-                            <td>${meal.description}</td>
-                            <td>${meal.calories}</td>
-                            <td><a>
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </a></td>
-                            <td><a onclick="deleteRow(${meal.id})">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </a></td>
-                        </tr>
-                    </c:forEach>
                 </table>
             </div>
         </div>
@@ -118,7 +100,7 @@
                                 code="meals.dateTime"/></label>
 
                         <div class="col-xs-9">
-                            <input type="datetime-local" class="form-control" id="dateTime" name="dateTime"
+                            <input type="text" class="form-control datetimepicker" id="dateTime" name="dateTime"
                                    placeholder="<spring:message code="meals.dateTime"/>">
                         </div>
                     </div>
@@ -152,4 +134,8 @@
     </div>
 </div>
 </body>
+<script type="text/javascript">
+    i18n["addTitle"] = '<spring:message code="meals.add"/>';
+    i18n["editTitle"] = '<spring:message code="meals.edit"/>';
+</script>
 </html>
