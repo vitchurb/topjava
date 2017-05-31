@@ -13,14 +13,11 @@ public class MessagesUtils {
     MessageSource messageSource;
 
     public String describeErrors(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            bindingResult.getGlobalErrors().forEach(ge -> sb.append(messageSource.getMessage(ge, LocaleContextHolder.getLocale()))
-                    .append("<br>"));
-            bindingResult.getFieldErrors().forEach(fe -> sb.append(messageSource.getMessage(fe, LocaleContextHolder.getLocale()))
-                    .append("<br>"));
-            return sb.toString();
-        }
-        return null;
+        StringBuilder sb = new StringBuilder();
+        bindingResult.getGlobalErrors().forEach(ge -> sb.append(messageSource.getMessage(ge, LocaleContextHolder.getLocale()))
+                .append("<br>"));
+        bindingResult.getFieldErrors().forEach(fe -> sb.append(messageSource.getMessage(fe, LocaleContextHolder.getLocale()))
+                .append("<br>"));
+        return sb.toString();
     }
 }

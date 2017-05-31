@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.User;
@@ -12,7 +11,6 @@ import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.MessagesUtils;
 import ru.javawebinar.topjava.util.UserUtil;
-import sun.misc.MessageUtils;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -49,8 +47,8 @@ public class AdminAjaxController extends AbstractUserController {
 
     @PostMapping
     public ResponseEntity<String> createOrUpdate(@Valid UserTo userTo, BindingResult result) {
-        String messageTexts = messagesUtils.describeErrors(result);
-        if (!StringUtils.isEmpty(messageTexts)) {
+        if (result.hasErrors()) {
+            String messageTexts = messagesUtils.describeErrors(result);
             return new ResponseEntity<>(messageTexts, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         if (userTo.isNew()) {
