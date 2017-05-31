@@ -6,12 +6,15 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealWithExceed;
+import ru.javawebinar.topjava.util.MessagesUtils;
 import ru.javawebinar.topjava.util.ValidationAjaxSave;
+import sun.misc.MessageUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,7 +25,7 @@ import java.util.List;
 public class MealAjaxController extends AbstractMealController {
 
     @Autowired
-    MessageSource messageSource;
+    MessagesUtils messagesUtils;
 
     @Override
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,13 +47,9 @@ public class MealAjaxController extends AbstractMealController {
 
     @PostMapping
     public ResponseEntity<String> createOrUpdate(@Validated(ValidationAjaxSave.class) Meal meal, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            result.getGlobalErrors().forEach(ge -> sb.append(messageSource.getMessage(ge, LocaleContextHolder.getLocale()))
-                    .append("<br>"));
-            result.getFieldErrors().forEach(fe -> sb.append(messageSource.getMessage(fe, LocaleContextHolder.getLocale()))
-                    .append("<br>"));
-            return new ResponseEntity<>(sb.toString(), HttpStatus.UNPROCESSABLE_ENTITY);
+        String messageTexts = messagesUtils.describeErrors(result);
+        if (!StringUtils.isEmpty(messageTexts)) {
+            return new ResponseEntity<>(messageTexts, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         if (meal.isNew()) {
             super.create(meal);
