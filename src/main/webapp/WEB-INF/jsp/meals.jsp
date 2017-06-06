@@ -70,9 +70,9 @@
         <table class="table table-striped display" id="datatable">
             <thead>
             <tr>
-                <th><spring:message code="meals.dateTime"/></th>
-                <th><spring:message code="meals.description"/></th>
-                <th><spring:message code="meals.calories"/></th>
+                <th><spring:message code="meal.dateTime"/></th>
+                <th><spring:message code="meal.description"/></th>
+                <th><spring:message code="meal.calories"/></th>
                 <th></th>
                 <th></th>
             </tr>
@@ -93,25 +93,25 @@
 
                     <div class="form-group">
                         <label for="dateTime" class="control-label col-xs-3"><spring:message
-                                code="meals.dateTime"/></label>
+                                code="meal.dateTime"/></label>
 
                         <div class="col-xs-9">
                             <input class="form-control" id="dateTime" name="dateTimeUI"
-                                   placeholder="<spring:message code="meals.dateTime"/>">
+                                   placeholder="<spring:message code="meal.dateTime"/>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="description" class="control-label col-xs-3"><spring:message
-                                code="meals.description"/></label>
+                                code="meal.description"/></label>
 
                         <div class="col-xs-9">
                             <input type="text" class="form-control" id="description" name="description"
-                                   placeholder="<spring:message code="meals.description"/>">
+                                   placeholder="<spring:message code="meal.description"/>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="calories" class="control-label col-xs-3"><spring:message
-                                code="meals.calories"/></label>
+                                code="meal.calories"/></label>
 
                         <div class="col-xs-9">
                             <input type="number" class="form-control" id="calories" name="calories" placeholder="1000">

@@ -10,7 +10,9 @@
     <div class="container">
         <div class="navbar-header navbar-brand"><spring:message code="app.title"/></div>
         <div class="navbar-collapse collapse">
-            <form:form class="navbar-form navbar-right" role="form" action="spring_security_check" method="post">
+
+            <ul class="nav navbar-form navbar-left">
+            <form:form class="" role="form" action="spring_security_check" method="post">
                 <div class="form-group">
                     <input type="text" placeholder="Email" class="form-control" name="username">
                 </div>
@@ -21,6 +23,8 @@
                     <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
                 </button>
             </form:form>
+            </ul>
+            <jsp:include page="fragments/changeLocale.jsp"/>
         </div>
     </div>
 </div>

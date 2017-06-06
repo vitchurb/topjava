@@ -4,12 +4,16 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -95,6 +99,31 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
         MATCHER.assertEquals(created, returned);
         MATCHER.assertCollectionEquals(Arrays.asList(ADMIN_MEAL2, created, ADMIN_MEAL1), service.getAll(ADMIN_ID));
+    }
+
+    @Test
+    public void testCreateWithValidationError() throws Exception {
+        Meal created = getCreated();
+        created.setCalories(15000);
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created))
+                .with(userHttpBasic(ADMIN)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().json("{'cause':'MethodArgumentNotValidException','detail':'Calories must be between 10 and 5,000<br/>'}"));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    public void testCreateWithValidationErrorDateTimeDublicated() throws Exception {
+        Meal created = getCreated();
+        created.setDateTime(LocalDateTime.of(2015, Month.JUNE, 1, 21, 0));
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created))
+                .with(userHttpBasic(ADMIN)))
+                .andExpect(status().isConflict())
+                .andExpect(content().json("{'cause':'DataIntegrityViolationException','detail':'Meal with this date/time already exists'}"));
     }
 
     @Test
